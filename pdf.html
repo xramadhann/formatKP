@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #3d3d3d;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #1e1e2d;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            transition: all 1s ease;
+        }
+        .sidebar h2 {
+            margin-top: 50px;
+        }
+        .menu-item {
+            display: block;
+            padding: 12px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 1s ease;
+
+
+        }
+        
+        .menu-item:hover {
+            background: white;
+            border-radius: 5px;
+            color: #1e1e2d;
+            transition: all 1s ease;
+
+
+        }
+        
+        .submenu {
+            font-family: 'Montserrat', sans-serif;
+            display: none;
+            padding-left: 20px;
+        }
+        
+        .submenu button {
+            font-family: 'Montserrat', sans-serif;
+
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px;
+            display: block;
+            transition: all 0.5s ease;
+
+        }
+        
+        .submenu button:hover {
+            background: white;
+            border-radius: 5px;
+            color: #1e1e2d;
+            transition: all 0.5s ease;
+        }
+        
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .pdf-image {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+        }
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            color: rgb(208, 255, 0);
+            background: none;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            left: 5px;
+            z-index: 1000;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                width: 250px;
+                height: 100vh;
+                background: #1e1e2d;
+                transition: all 1s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+
+                transition: all 1s ease;
+                
+            }
+            
+            .hamburger {
+                display: block;
+            }
+            
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <h2>LAPORAN KP XR</h2>
+        <button class="menu-item" onclick="toggleDropdown('toc')">
+            <i class="fas fa-book"></i> Daftar Isi <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+        </button>
+        <div id="toc" class="submenu">
+            <button onclick="scrollToPage(13)">Bab 1</button>
+            <button onclick="scrollToPage(19)">Bab 2</button>
+            <button onclick="scrollToPage(34)">Bab 3</button>
+            <button onclick="scrollToPage(36)">Bab 4</button>
+            <button onclick="scrollToPage(121)">Bab 5</button>
+        </div>
+        <button class="menu-item" onclick="downloadKP()">
+            <i class="fas fa-chart-line"></i> Download Format KP
+        </button>
+            </div>
+    
+    <div class="content">
+        <div id="pdf-images-container" class="container"></div>
+    </div>
+    
+    <script>
+        function toggleDropdown(id) {
+            const element = document.getElementById(id);
+            element.style.display = element.style.display === "block" ? "none" : "block";
+        }
+        
+        function scrollToPage(pageNum) {
+            const element = document.getElementById(`page-${pageNum}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        function scrollToPage(pageNum) {
+    const element = document.getElementById(`page-${pageNum}`);
+    if (element) {
+        const targetPosition = element.getBoundingClientRect().top + window.scrollY;
+        const startPosition = window.scrollY;
+        const distance = targetPosition - startPosition;
+        const duration = 10000; // Durasi scroll dalam milidetik (2 detik)
+        let startTime = null;
+
+        function animationScroll(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+            window.scrollTo(0, run);
+            if (timeElapsed < duration) requestAnimationFrame(animationScroll);
+        }
+
+        function easeInOutQuad(t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) return (c / 2) * t * t + b;
+            t--;
+            return (-c / 2) * (t * (t - 2) - 1) + b;
+        }
+
+        requestAnimationFrame(animationScroll);
+    }
+}
+function downloadKP() {
+    const link = document.createElement('a');
+    link.href = 'assets/formatKPbyXRamm.docx'; // Path ke file Word
+    link.download = 'Format_KP.docx'; // Nama file saat didownload
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+        
+        const totalPages = 128;
+        const container = document.getElementById('pdf-images-container');
+
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+            const img = document.createElement('img');
+            img.src = `assets/LaporanKP_page-${String(pageNum).padStart(4, '0')}.jpg`;
+            img.className = 'pdf-image';
+            img.alt = `Halaman ${pageNum}`;
+            img.id = `page-${pageNum}`;
+            container.appendChild(img);
+        }
+    </script>
+</body>
+</html>
